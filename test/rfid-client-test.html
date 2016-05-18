@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>RFID test client</title>
+	<style>
+		.title {
+			font-size: 12pt;
+			font-weight: bold;
+		}
+		
+		#barcodes {
+			font-family: "monospace";
+			font-size: 12pt;
+		}
+		
+		#log {
+			font-size: 12pt;
+			width: 99%;
+			height: 300px;
+		}		
+	</style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.1.0/rx.lite.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs-dom/7.0.3/rx.dom.js"></script>
+	<script src="rfid-client.js"></script>
+	<script>
+	
+	function $(id) {
+		return document.getElementById(id);
+	}
+	
+	var rfidClient = new com.axiell.rfid.Client();
+	rfidClient.eventObservable()
+		.filter(function(e) {
+			return e.event == "received";
+		})
+		.subscribe(function(e) {
+			var values = $("barcodes").value
+				.split("\n")
+				.filter(function(e) {
+					return e !== "";
+				});
+			values.push(e.barcode);
+			$("barcodes").value = values.join("\n");
+		});
+	rfidClient.eventObservable()
+		.subscribe(function(e) {
+			var values = $("events").value
+				.split("\n")
+				.filter(function(e) {
+					return e !== "";
+				});
+			values.push(JSON.stringify(e));
+			$("events").value = values.join("\n");
+		});
+
+	rfidClient.connect();
+
+	document.addEventListener('DOMContentLoaded', function() {
+		$("action_reread").addEventListener("click", function() {
+			rfidClient.reread();
+		});
+		$("action_clear").addEventListener("click", function() {
+			$("barcodes").value = "";
+		});
+		$("action_clear_events").addEventListener("click", function() {
+			$("events").value = "";
+		});
+		$("barcodes").value = "";
+		$("events").value = "";
+	});
+
+	</script>
+
+</head>
+
+<body>
+	<div>
+		<button id="action_reread">reread</button>
+	</div>
+	<div class="title">Barcode received:</div>
+	<textarea id="barcodes" cols="20" rows="15"></textarea>
+	<div>
+		<button id="action_clear">Clear</button>
+	</div>
+	<br/>
+	<div class="title">Event received:</div>
+	<textarea id="events" cols="80" rows="24"></textarea>
+	<div>
+		<button id="action_clear_events">Clear</button>
+	</div>
+</body>
+</html>
