@@ -28,34 +28,48 @@
 		return document.getElementById(id);
 	}
 	
-	var rfidClient = new com.axiell.rfid.Client();
-	rfidClient.eventObservable()
-		.filter(function(e) {
-			return e.event == "received";
-		})
-		.subscribe(function(e) {
-			var values = $("barcodes").value
-				.split("\n")
-				.filter(function(e) {
-					return e !== "";
-				});
-			values.push(e.barcode);
-			$("barcodes").value = values.join("\n");
-		});
-	rfidClient.eventObservable()
-		.subscribe(function(e) {
-			var values = $("events").value
-				.split("\n")
-				.filter(function(e) {
-					return e !== "";
-				});
-			values.push(JSON.stringify(e));
-			$("events").value = values.join("\n");
-		});
-
-	rfidClient.connect();
+	var rfidClient = null;
 
 	document.addEventListener('DOMContentLoaded', function() {
+		$("action_connect").addEventListener("click", function() {
+			var hostname = $("hostname").value;
+			var port = $("port").value;
+			rfidClient = new com.axiell.rfid.Client({ hostname: hostname, port: port });
+			rfidClient.eventObservable()
+				.filter(function(e) {
+					return e.event === "received";
+				})
+				.subscribe(function(e) {
+					var values = $("barcodes").value
+						.split("\n")
+						.filter(function(e) {
+							return e !== "";
+						});
+					values.push(e.barcode);
+					$("barcodes").value = values.join("\n");
+				});
+			rfidClient.eventObservable()
+				.subscribe(function(e) {
+					var values = $("events").value
+						.split("\n")
+						.filter(function(e) {
+							return e !== "";
+						});
+					values.push(JSON.stringify(e));
+					$("events").value = values.join("\n");
+				});
+			rfidClient.eventObservable()
+				.subscribe(function(e) {
+					if (e.event === "connected") {
+						$("action_connect").disabled = true;
+						$("action_reread").disabled = false;
+					} else if (e.event === "disconnected") {
+						$("action_connect").disabled = false;
+						$("action_reread").disabled = true;
+					}
+				});
+			rfidClient.connect();
+		});
 		$("action_reread").addEventListener("click", function() {
 			rfidClient.reread();
 		});
@@ -65,6 +79,7 @@
 		$("action_clear_events").addEventListener("click", function() {
 			$("events").value = "";
 		});
+		$("action_reread").disabled = true;
 		$("barcodes").value = "";
 		$("events").value = "";
 	});
@@ -75,6 +90,10 @@
 
 <body>
 	<div>
+		<label for="hostname">hostname</label><input id="hostname" size="30" value="localhost"/> <label for="port">port</label><input id="port" size="5" value="7000" />
+	</div>
+	<div>
+		<button id="action_connect">connect</button>
 		<button id="action_reread">reread</button>
 	</div>
 	<div class="title">Barcode received:</div>
