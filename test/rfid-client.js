@@ -56,14 +56,17 @@ com.axiell.rfid = function() {
 
 			var closingObserver = Rx.Observer.create(function() {
 				console.log('socket is about to close');
-				this._subject.onNext({ event: "connection-lost" });
+				if (!this._socket) {
+					this._subject.onNext({ event: "connectionFailed", config: this.config });
+				} else {
+					this._subject.onNext({ event: "disconnected" });
+				}
 				this._readSubscription.dispose();
 				this._socket = null;
 			}.bind(this));
 		
 			this._opening = true;
 			socket = Rx.DOM.fromWebSocket("ws://"+this.config.hostname+":"+this.config.port, null, openObserver, closingObserver);
-			console.log(socket);
 			this._readSubscription = socket.subscribe(
 				function(e) {
 					console.debug('message: %s', e.data);
