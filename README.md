@@ -6,4 +6,5 @@ To run the server the following node modules needs to be installed:
 - websocket
 - log4js
 
-npm install minimist websocket log4js
+Run the following to install:
+```npm install```
