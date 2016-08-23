@@ -20,11 +20,13 @@ const os = require("os");
 
 function getLocalIpAddress() {
 	var networkInterfaces = os.networkInterfaces();
-	var networkInterface = networkInterfaces["en0"] || networkInterfaces["en1"] || networkInterfaces["en2"] || networkInterfaces["en3"] || networkInterfaces["en4"];
-	if (networkInterface.length > 1) {
+	var names = Object.keys(networkInterfaces).filter(function(name) {
+		var networkInterface = networkInterfaces[name];
+		return networkInterface.length > 1 && !networkInterface[1].internal;
+	});
+	var networkInterface = names.length > 0 ? networkInterfaces[names[0]] : null;
+	if (networkInterface) {
 		return networkInterface[1].address;
-	} else if (networkInterface.length > 0) {
-		return networkInterface[0].address;
 	} else {
 		return "Unknown address";
 	}
