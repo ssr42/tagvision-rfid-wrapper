@@ -16,10 +16,26 @@ const http = require("http");
 const log4js = require("log4js"); 
 const port = argv.port;
 const logger = log4js.getLogger("test");
+const os = require("os");
+
+function getLocalIpAddress() {
+	var networkInterfaces = os.networkInterfaces();
+	var networkInterface = networkInterfaces["en0"] || networkInterfaces["en1"] || networkInterfaces["en2"] || networkInterfaces["en3"] || networkInterfaces["en4"];
+	if (networkInterface.length > 1) {
+		return networkInterface[1].address;
+	} else if (networkInterface.length > 0) {
+		return networkInterface[0].address;
+	} else {
+		return "Unknown address";
+	}
+}
+
 // redirect console
 console.log = logger.debug.bind(logger);
 console.debug = logger.debug.bind(logger);
 console.error = logger.error.bind(logger);
+
+console.log("Local machine IP-address: "+getLocalIpAddress());
 
 var server = http.createServer(function(request, response) {
 	console.debug("Received request for " + request.url);
