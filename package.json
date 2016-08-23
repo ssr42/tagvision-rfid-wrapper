@@ -1,0 +1,25 @@
+{
+  "name": "tagvision-rfid-wrapper",
+  "version": "1.0.0",
+  "description": "A wrapper that expose the TagVision protocol as a websocket",
+  "devDependencies": {
+    "log4js": "^0.6.36",
+    "websocket": "^1.0.22",
+    "minimist": "^1.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ssr42/tagvision-rfid-wrapper"
+  },
+  "keywords": [
+    "TagVision",
+    "RFID"
+  ],
+  "author": "Svend Raasø",
+  "license": "ISC",
+  "dependencies": {
+  }
+}
