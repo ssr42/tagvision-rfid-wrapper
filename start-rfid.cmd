@@ -1,4 +1,5 @@
-start "" "C:\Bibliotheca RFID\RFIDIFServer1.2.10\RFIDIFServer.exe"
+@echo off
+start "" "C:\Bibliotheca RFID\RFIDIFServer\RFIDIFServer.exe"
 start "" "C:\Bibliotheca RFID\RFIDIF\RFIDIF.exe"
 timeout 2 > NUL
 node server
